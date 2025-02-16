@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
     public function index(){
-        return view('products.index');
+        $products = Product::all();
+        return view('products.index', ['products' => $products]);
     }
 
     public function create(){
@@ -22,7 +23,7 @@ class ProductController extends Controller
         $data = $request->validate([
             'name' => 'required',
             'qty' => 'required|numeric',
-            'price' => 'required|decimal:2',
+            'price' => 'required|decimal:0,2',
             'description' => 'nullable'
         ]);
 
@@ -31,5 +32,31 @@ class ProductController extends Controller
         return redirect(route('product.index'));
     }
 
+    public function edit(Product $product){
+        return view('products.edit', ['product' => $product]);
+        // dd($product);
+    
+    }
 
+    public function update(Request $request, Product $product){
+        
+        //data that receive from form, validate it
+        $data = $request->validate([
+            'name' => 'required',
+            'qty' => 'required|numeric',
+            'price' => 'required|decimal:0,2',
+            'description' => 'nullable'
+        ]);
+
+        //update the product
+        $product->update($data); 
+
+        //redirect to the product index page
+        return redirect(route('product.index')) -> with('success', 'Product updated successfully');
+    }
+
+    public function destroy(Product $product){
+        $product->delete();
+        return redirect(route('product.index')) -> with('success', 'Product deleted successfully');
+    }
 }
